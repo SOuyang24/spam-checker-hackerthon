@@ -74,6 +74,10 @@ def load_all_data():
                 title="<b>Text Message by Category</b>",
                 color_discrete_sequence=["#0083B8"] * len(counts_by_Category),
                 template="plotly_white",
+                labels={
+                    "Message": "Message Count",
+                    "Category": "Message Category",
+                },
             )
             config = {
                 "toImageButtonOptions": {
@@ -82,14 +86,16 @@ def load_all_data():
                     "height": 500,
                     "width": 700,
                     "scale": 1,  # Multiply title/legend/axis/canvas sizes by this factor
-                }
+                },
+                "displaylogo": False,
+                "modeBarButtonsToRemove": ["zoom", "pan"],
             }
             fig_spam_check.update_layout(
                 plot_bgcolor="rgba(0,0,0,0)",
                 yaxis=dict(showgrid=False),
                 margin=dict(l=20, r=20, t=20, b=20),
             )
-            st.plotly_chart(fig_spam_check, **{"config": config})
+            st.plotly_chart(fig_spam_check, use_container_width=False, config=config)
 
 
 def load_lottieUrl(url):
