@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import cohere as cohere
 from cohere.responses.classify import Example
-from decouple import config
 import streamlit as st
 import json
 from array import array
@@ -19,7 +18,7 @@ import plotly.express as px
 DATA_SOURCE = "dataset/spam.csv"
 MAX_ROWS = 1000
 LOTTIE_AI_JSON = "https://assets2.lottiefiles.com/packages/lf20_zrqthn6o.json"
-API_KEY = config("API_KEY")
+API_KEY = st.secrets["API_KEY"]
 co = cohere.Client(API_KEY)
 textMessage = ""
 AI_PROMPT_SPAM = "write me a sample SMS text message that is a spam message and less than two setences"

@@ -17,6 +17,7 @@ charset-normalizer = "*"
 matplotlib = "*"
 plotly = "*"
 plotly-express = "*"
+decouple = "*"
 
 [dev-packages]
 

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "292b0638bd093b61979129dc53099ddf5a22f90d458ebbc8008a14dc779d8906"
+            "sha256": "320931979bcb5c45a975d035776be37575be9eab3fe0e5ba6a3146323671e78c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -591,6 +591,13 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==5.1.1"
+        },
+        "decouple": {
+            "hashes": [
+                "sha256:c253c1cc62b76e9720a066f334552548c6de1884bc3bdf456ddb62d61b867b09"
+            ],
+            "index": "pypi",
+            "version": "==0.0.7"
         },
         "defusedxml": {
             "hashes": [
@@ -1888,14 +1895,6 @@
             "markers": "python_version < '3.12' and python_version >= '3.8'",
             "version": "==1.10.1"
         },
-        "semver": {
-            "hashes": [
-                "sha256:94df43924c4521ec7d307fc86da1531db6c2c33d9d5cdc3e64cca0eb68569269",
-                "sha256:ab4f69fb1d1ecfb5d81f96411403d7a611fa788c45d252cf5b408025df3ab6ce"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.0.0"
-        },
         "send2trash": {
             "hashes": [
                 "sha256:d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d",
@@ -1975,11 +1974,11 @@
         },
         "streamlit": {
             "hashes": [
-                "sha256:41a544b8dc618ee65726da3ac76149c5b2bf3da7bde6d50625c4f7ec95e6c9e8",
-                "sha256:f6e257e033a2532ce9b37c425717a4e885fa4d0e339fa5dcdbbda8d75ec191e9"
+                "sha256:05862598952a9126e16652caa5bc88eeeea7b2773af252e2daccf1c84ceaaef4",
+                "sha256:c72d9639508679c5e411d1f886d213777759501d01975285c049dc30db463c1a"
             ],
             "index": "pypi",
-            "version": "==1.20.0"
+            "version": "==1.21.0"
         },
         "streamlit-lottie": {
             "hashes": [
