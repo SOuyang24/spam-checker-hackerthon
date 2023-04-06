@@ -14,7 +14,7 @@ import random
 import charset_normalizer
 import plotly.express as px
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 # VARIABLES
 DATA_SOURCE = "dataset/spam.csv"
@@ -82,16 +82,18 @@ def load_all_data():
                 colormap="Greens",
             ).generate(ham_text_collection)
             # Display the generated image:
+            fig1, ax = plt.subplots()
             plt.title("Spam Word Cloud")
             plt.imshow(wordcloud_spam, interpolation="bilinear")
             plt.axis("off")
             plt.show()
-            st.pyplot()
+            st.pyplot(fig1)
+            fig2, ax = plt.subplots()
             plt.title("Non Spam Word Cloud")
             plt.imshow(wordcloud_ham, interpolation="bilinear")
             plt.axis("off")
             plt.show()
-            st.pyplot()
+            st.pyplot(fig2)
         with left_col:
             st.header("Data Visualization :bar_chart:")
             st.write("##")
