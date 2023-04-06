@@ -13,6 +13,8 @@ from streamlit_lottie import st_lottie
 import random
 import charset_normalizer
 import plotly.express as px
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+import matplotlib.pyplot as plt
 
 # VARIABLES
 DATA_SOURCE = "dataset/spam.csv"
@@ -52,15 +54,47 @@ def load_data():
 def load_all_data():
     with st.container():
         st.write("---")
+        # attempting to detect the csv file character encoding
+        with open(DATA_SOURCE, "rb") as csv:
+            detected_encoding = charset_normalizer.detect(csv.read(250000))
+        df = pd.read_csv(DATA_SOURCE, encoding=detected_encoding["encoding"])
         left_col, right_col = st.columns(2)
+        with right_col:
+            spam_text_list = df.query("Category == 'spam'")["Message"].values.tolist()
+            spam_text_collection = " ".join(spam_text_list)
+            ham_text_list = df.query("Category == 'ham'")["Message"].values.tolist()
+            ham_text_collection = " ".join(ham_text_list)
+            # Create and generate a word cloud image:
+            wordcloud_spam = WordCloud(
+                width=520,
+                height=260,
+                stopwords=STOPWORDS,
+                max_font_size=50,
+                background_color="black",
+                colormap="Blues",
+            ).generate(spam_text_collection)
+            wordcloud_ham = WordCloud(
+                width=520,
+                height=260,
+                stopwords=STOPWORDS,
+                max_font_size=50,
+                background_color="black",
+                colormap="Greens",
+            ).generate(ham_text_collection)
+            # Display the generated image:
+            plt.title("Spam Word Cloud")
+            plt.imshow(wordcloud_spam, interpolation="bilinear")
+            plt.axis("off")
+            plt.show()
+            st.pyplot()
+            plt.title("Non Spam Word Cloud")
+            plt.imshow(wordcloud_ham, interpolation="bilinear")
+            plt.axis("off")
+            plt.show()
+            st.pyplot()
         with left_col:
             st.header("Data Visualization :bar_chart:")
             st.write("##")
-            # attempting to detect the csv file character encoding
-            with open(DATA_SOURCE, "rb") as csv:
-                detected_encoding = charset_normalizer.detect(csv.read(250000))
-
-            df = pd.read_csv(DATA_SOURCE, encoding=detected_encoding["encoding"])
             counts_by_Category = (
                 df.groupby(by=["Category"])
                 .count()[["Message"]]
@@ -95,6 +129,7 @@ def load_all_data():
                 yaxis=dict(showgrid=False),
                 margin=dict(l=20, r=20, t=20, b=20),
             )
+            st.set_option("deprecation.showPyplotGlobalUse", False)
             st.plotly_chart(fig_spam_check, use_container_width=False, config=config)
 
 

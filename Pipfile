@@ -18,6 +18,7 @@ matplotlib = "*"
 plotly = "*"
 plotly-express = "*"
 decouple = "*"
+wordcloud = "*"
 
 [dev-packages]
 
