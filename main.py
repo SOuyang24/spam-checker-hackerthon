@@ -282,7 +282,7 @@ def setClassificationLogic():
                         )
                         st.write(result)
                         st.write(
-                            "Accuracy is: {accuracy}".format(
+                            "Confidence value is: {accuracy}".format(
                                 accuracy=response.classifications[0].confidence
                             )
                         )
