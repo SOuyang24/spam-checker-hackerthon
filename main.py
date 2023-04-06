@@ -21,8 +21,8 @@ LOTTIE_AI_JSON = "https://assets2.lottiefiles.com/packages/lf20_zrqthn6o.json"
 API_KEY = st.secrets["API_KEY"]
 co = cohere.Client(API_KEY)
 textMessage = ""
-AI_PROMPT_SPAM = "write me a sample SMS text message that is a spam message and less than two setences"
-AI_PROMPT_NON_SPAM = "write me a sample SMS text message that is not a spam message and less than two setences"
+AI_PROMPT_SPAM = "write me a sample SMS text message that is a spam message and less than 150 characters"
+AI_PROMPT_NON_SPAM = "write me a sample SMS text message that is not a spam message and less than 150 characters"
 DATA_CATEGORY_TYPE_SPAM = "spam"
 DATA_CATEGORY_TYPE_NON_SPAM = "ham"
 FORMATTED_TXT = """<span style="word-wrap:break-word;">{content}</span>"""
