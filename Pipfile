@@ -20,6 +20,7 @@ plotly-express = "*"
 decouple = "*"
 wordcloud = "*"
 python-dotenv = "*"
+dask = "*"
 
 [dev-packages]
 black="*"

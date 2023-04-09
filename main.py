@@ -14,6 +14,7 @@ import random
 import charset_normalizer
 import plotly.express as px
 from dotenv import dotenv_values
+import dask.dataframe as dd
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
@@ -46,7 +47,8 @@ if "json_objects" not in st.session_state:
 
 @st.cache_data
 def load_data():
-    data = pd.read_csv(DATA_SOURCE)
+    data = dd.read_csv(DATA_SOURCE)
+    data = data.compute()
     if (data.shape[0]) > MAX_ROWS:
         df = data.head(MAX_ROWS)
     else:
@@ -58,12 +60,8 @@ def load_data():
 def load_all_data():
     with st.container():
         st.write("---")
-        # attempting to detect the csv file character encoding
-        with open(DATA_SOURCE, "rb") as csv:
-            detected_encoding = charset_normalizer.detect(csv.read(250000))
-        df = pd.read_csv(
-            DATA_SOURCE, encoding=detected_encoding["encoding"], engine="pyarrow"
-        )
+        df = dd.read_csv(DATA_SOURCE)
+        df = df.compute()
         left_col, right_col = st.columns(2)
         with right_col:
             spam_text_list = df.query("Category == 'spam'")["Message"].values.tolist()
@@ -87,19 +85,19 @@ def load_all_data():
                 background_color="black",
                 colormap="Greens",
             ).generate(ham_text_collection)
-        # Display the generated image:
-        fig1, ax = plt.subplots()
-        plt.title("Spam Word Cloud")
-        plt.imshow(wordcloud_spam, interpolation="bilinear")
-        plt.axis("off")
-        plt.show()
-        st.pyplot(fig1)
-        fig2, ax = plt.subplots()
-        plt.title("Non Spam Word Cloud")
-        plt.imshow(wordcloud_ham, interpolation="bilinear")
-        plt.axis("off")
-        plt.show()
-        st.pyplot(fig2)
+            # Display the generated image:
+            fig1, ax = plt.subplots()
+            plt.title("Spam Word Cloud")
+            plt.imshow(wordcloud_spam, interpolation="bilinear")
+            plt.axis("off")
+            plt.show()
+            st.pyplot(fig1)
+            fig2, ax = plt.subplots()
+            plt.title("Non Spam Word Cloud")
+            plt.imshow(wordcloud_ham, interpolation="bilinear")
+            plt.axis("off")
+            plt.show()
+            st.pyplot(fig2)
         with left_col:
             st.header("Data Visualization :bar_chart:")
             st.write("##")
