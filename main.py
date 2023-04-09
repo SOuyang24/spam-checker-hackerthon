@@ -7,15 +7,12 @@ import cohere as cohere
 from cohere.responses.classify import Example
 import streamlit as st
 import json
-from array import array
 import requests
 from streamlit_lottie import st_lottie
 import random
-import charset_normalizer
 import plotly.express as px
 from dotenv import dotenv_values
 import dask.dataframe as dd
-
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 
@@ -33,7 +30,10 @@ AI_PROMPT_NON_SPAM = "write me a sample SMS text message that is not a spam mess
 DATA_CATEGORY_TYPE_SPAM = "spam"
 DATA_CATEGORY_TYPE_NON_SPAM = "ham"
 FORMATTED_TXT = """<span style="word-wrap:break-word;">{content}</span>"""
-
+primary_blue = "#496595"
+primary_blue2 = "#85a1c1"
+primary_blue3 = "#3f4d63"
+primary_grey = "#c6ccd8"
 # Initialization
 if "message" not in st.session_state:
     st.session_state["message"] = ""
@@ -112,7 +112,9 @@ def load_all_data():
                 y="Message",
                 orientation="v",
                 title="<b>Text Message by Category</b>",
-                color_discrete_sequence=["#0083B8"] * len(counts_by_Category),
+                # color_discrete_sequence=["#0083B8"] * len(counts_by_Category),
+                color_discrete_map={"spam": "red", "ham": "green"},
+                color=["ham", "spam"],
                 template="plotly_white",
                 labels={
                     "Message": "Message Count",
