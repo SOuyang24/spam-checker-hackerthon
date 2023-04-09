@@ -13,14 +13,18 @@ from streamlit_lottie import st_lottie
 import random
 import charset_normalizer
 import plotly.express as px
+from dotenv import dotenv_values
 
-# from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS
 
 # VARIABLES
 DATA_SOURCE = "dataset/spam.csv"
 MAX_ROWS = 1000
 LOTTIE_AI_JSON = "https://assets2.lottiefiles.com/packages/lf20_zrqthn6o.json"
-API_KEY = st.secrets["API_KEY"]
+# API_KEY = st.secrets["API_KEY"]
+config = dotenv_values(".env")
+API_KEY = config["API_KEY"]
 co = cohere.Client(API_KEY)
 textMessage = ""
 AI_PROMPT_SPAM = "write me a sample SMS text message that is a spam message and less than 150 characters"
@@ -57,43 +61,45 @@ def load_all_data():
         # attempting to detect the csv file character encoding
         with open(DATA_SOURCE, "rb") as csv:
             detected_encoding = charset_normalizer.detect(csv.read(250000))
-        df = pd.read_csv(DATA_SOURCE, encoding=detected_encoding["encoding"])
+        df = pd.read_csv(
+            DATA_SOURCE, encoding=detected_encoding["encoding"], engine="pyarrow"
+        )
         left_col, right_col = st.columns(2)
-        # with right_col:
-        #     spam_text_list = df.query("Category == 'spam'")["Message"].values.tolist()
-        #     spam_text_collection = " ".join(spam_text_list)
-        #     ham_text_list = df.query("Category == 'ham'")["Message"].values.tolist()
-        #     ham_text_collection = " ".join(ham_text_list)
-        #     # Create and generate a word cloud image:
-        #     wordcloud_spam = WordCloud(
-        #         width=520,
-        #         height=260,
-        #         stopwords=STOPWORDS,
-        #         max_font_size=50,
-        #         background_color="black",
-        #         colormap="Blues",
-        #     ).generate(spam_text_collection)
-        #     wordcloud_ham = WordCloud(
-        #         width=520,
-        #         height=260,
-        #         stopwords=STOPWORDS,
-        #         max_font_size=50,
-        #         background_color="black",
-        #         colormap="Greens",
-        #     ).generate(ham_text_collection)
+        with right_col:
+            spam_text_list = df.query("Category == 'spam'")["Message"].values.tolist()
+            spam_text_collection = " ".join(spam_text_list)
+            ham_text_list = df.query("Category == 'ham'")["Message"].values.tolist()
+            ham_text_collection = " ".join(ham_text_list)
+            # Create and generate a word cloud image:
+            wordcloud_spam = WordCloud(
+                width=520,
+                height=260,
+                stopwords=STOPWORDS,
+                max_font_size=50,
+                background_color="black",
+                colormap="Blues",
+            ).generate(spam_text_collection)
+            wordcloud_ham = WordCloud(
+                width=520,
+                height=260,
+                stopwords=STOPWORDS,
+                max_font_size=50,
+                background_color="black",
+                colormap="Greens",
+            ).generate(ham_text_collection)
         # Display the generated image:
-        # fig1, ax = plt.subplots()
-        # plt.title("Spam Word Cloud")
-        # plt.imshow(wordcloud_spam, interpolation="bilinear")
-        # plt.axis("off")
-        # plt.show()
-        # st.pyplot(fig1)
-        # fig2, ax = plt.subplots()
-        # plt.title("Non Spam Word Cloud")
-        # plt.imshow(wordcloud_ham, interpolation="bilinear")
-        # plt.axis("off")
-        # plt.show()
-        # st.pyplot(fig2)
+        fig1, ax = plt.subplots()
+        plt.title("Spam Word Cloud")
+        plt.imshow(wordcloud_spam, interpolation="bilinear")
+        plt.axis("off")
+        plt.show()
+        st.pyplot(fig1)
+        fig2, ax = plt.subplots()
+        plt.title("Non Spam Word Cloud")
+        plt.imshow(wordcloud_ham, interpolation="bilinear")
+        plt.axis("off")
+        plt.show()
+        st.pyplot(fig2)
         with left_col:
             st.header("Data Visualization :bar_chart:")
             st.write("##")
