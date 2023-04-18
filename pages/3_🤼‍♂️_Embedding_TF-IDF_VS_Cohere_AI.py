@@ -25,7 +25,7 @@ co = utils.getCohereApiClient()
 accuracy = {}
 
 
-@st.cache_data
+@st.cache_data(persist="disk", show_spinner=True)
 def load_data(rowNumber=2000):
     data = dd.read_csv(constants.DATA_SOURCE)
     data = data.compute()
@@ -38,7 +38,7 @@ def load_data(rowNumber=2000):
         data = data
     return data
 
-@st.cache_data
+@st.cache_data(persist="disk", show_spinner=True)
 def load_data_with_nltk_preprocessing(rowNumber=constants.MAX_ROWS):
     data = dd.read_csv(constants.DATA_SOURCE)
     data = data.compute()
@@ -60,7 +60,7 @@ def load_data_with_nltk_preprocessing(rowNumber=constants.MAX_ROWS):
         data = data
     return data
 
-@st.cache_data(persist="disk", show_spinner=True)
+# @st.cache_data(show_spinner=True)
 def setEmbeddedClassificationTFIDF():
     data = load_data_with_nltk_preprocessing()
     corpus = []
@@ -84,7 +84,7 @@ def setEmbeddedClassificationTFIDF():
         tfidf_accuracy[utils.print_estimator_name(classifier)] = score
     return tfidf_accuracy
 
-@st.cache_data(persist="disk", show_spinner=True)
+# @st.cache_data(show_spinner=True)
 def setEmbeddedClassificationCohere():
     # Splitting the testing and training sets
     # Build a pipeline of model for four different classifiers.
