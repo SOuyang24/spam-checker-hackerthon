@@ -9,7 +9,6 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import precision_score, recall_score, plot_confusion_matrix, classification_report, accuracy_score, f1_score
 from sklearn import metrics
 import dask.dataframe as dd
 import matplotlib.pyplot as plt
