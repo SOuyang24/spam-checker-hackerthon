@@ -24,6 +24,7 @@ dask = "*"
 regex = "*"
 nltk = "*"
 seaborn = "*"
+google-cloud-translate = "*"
 
 [dev-packages]
 black="*"

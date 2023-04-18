@@ -21,11 +21,13 @@ if "classify_inputs" not in st.session_state:
 if "json_objects" not in st.session_state:
     st.session_state["json_objects"] = []
 
+st.markdown("### 🤖 Spam Prediction")
+st.sidebar.markdown("### 🤖 Spam Prediction")
+
 @st.cache_data
 def load_data(rowNumber=constants.MAX_ROWS):
     data = dd.read_csv(constants.DATA_SOURCE)
     data = data.compute()
-    data["Message"] = data["Message"].apply(utils.clean)
     if (data.shape[0]) > rowNumber:
         df = data.sample(rowNumber)
     else:
@@ -45,6 +47,7 @@ def filterStatusByNonSpam(data):
 
 def generateRandomMessageByAI(prompt):
     data_load_state = st.text("start text generation...")
+    classify_inputs = []
     response = co.generate(
         model="command-xlarge-nightly",
         prompt=prompt,
@@ -56,12 +59,12 @@ def generateRandomMessageByAI(prompt):
     )
     if len(response.generations) > 0:
         text_message = str(response.generations[0].text)
-        classify_inputs = []
         classify_inputs.append(text_message)
         st.session_state["classify_inputs"] = classify_inputs
         st.write(text_message)
     data_load_state.text("")
 
+@st.cache_data
 def generateRandomMessageByDataSet(type):
     if type == constants.DATA_CATEGORY_TYPE_SPAM:
         dataset = st.session_state["json_objects"]
@@ -84,13 +87,14 @@ def generateRandomMessageByDataSet(type):
 
 def generateRandomMessageComponent(type):
     with st.container():
+        inputs = []
         columns1, columns2 = st.columns(2)
         spam_message_button = columns1.button(
-            "Generate Spam Message", key=constants.DATA_CATEGORY_TYPE_SPAM, type="primary"
+            "Generate Spam SMS", key=constants.DATA_CATEGORY_TYPE_SPAM, type="primary"
         )
         ham_message_button = columns2.button(
-            "Generate Non-Spam Message",
-            key=DATA_CATEGORY_TYPE_NON_SPAM,
+            "Generate Normal SMS",
+            key=constants.DATA_CATEGORY_TYPE_NON_SPAM,
             type="secondary",
         )
         if spam_message_button:
@@ -104,31 +108,33 @@ def generateRandomMessageComponent(type):
             else:
                 generateRandomMessageByDataSet(constants.DATA_CATEGORY_TYPE_NON_SPAM)
 
-def loadExamples(data):
+def load_examples(data):
     examples = []
     df2 = data.to_json(orient="records")
     json_object = json.loads(df2)
     st.session_state["json_objects"] = json_object
     for item in json_object:
         examples.append(Example(item["Message"], item["Category"]))
-    return examples
+    st.session_state["examples"] = examples
 
 def setClassificationLogic():
+    inputs = []
+    classify_inputs = []
     data = load_data()
-    examples = loadExamples(data)
+    load_examples(data)
     with st.container():
-        st.write("---")
-        st.header("Classification :rocket:")
-        left_col, right_col = st.columns(2)
+        left_col, right_col = st.columns([3, 1])
         with left_col:
             option = st.selectbox(
                 "How would you like generate a text message",
                 ("", "From existing dataset", "AI Generated", "Manual Input"),
             )
             if option == "From existing dataset":
+                # st.session_state["classify_inputs"] = []
                 generateRandomMessageComponent("Dataset")
             elif option == "Manual Input":
                 with st.container():
+                    text_message = ""
                     input = st.text_area(
                         label="Text Message",
                         value="",
@@ -136,10 +142,10 @@ def setClassificationLogic():
                         label_visibility="hidden",
                     )
                     text_message = str(input)
-                    classify_inputs = []
-                    classify_inputs.append(text_message)
-                    st.session_state["classify_inputs"] = classify_inputs
+                    inputs.append(text_message)
+                    st.session_state["classify_inputs"] = inputs
             elif option == "AI Generated":
+                # st.session_state["classify_inputs"] = []
                 generateRandomMessageComponent("AI")
 
             with st.container():
@@ -149,13 +155,14 @@ def setClassificationLogic():
                     disabled=False
                     if len(st.session_state["classify_inputs"]) > 0
                     else True,
+                    # on_click=handle_classification
                 )
                 if classify:
                     data_load_classification = st.text("Start Classification...")
                     response = co.classify(
                         model="large",
                         inputs=st.session_state["classify_inputs"],
-                        examples=examples,
+                        examples=st.session_state["examples"],
                     )
                     st.write(st.session_state["classify_inputs"][0])
                     if len(response.classifications) > 0:
@@ -174,6 +181,32 @@ def setClassificationLogic():
 
                     data_load_classification.text("")
 
-st.markdown("# Page 4 ❄️")
-st.sidebar.markdown("Spam Classification")
+
+
+                    
+
+def handle_classification():
+    data_load_classification = st.text("Start Classification...")
+    response = co.classify(
+        model="large",
+        inputs=st.session_state["classify_inputs"],
+        examples=st.session_state["examples"],
+    )
+    st.write(st.session_state["classify_inputs"][0])
+    if len(response.classifications) > 0:
+        result = (
+            "Above message is not a spam message"
+            if response.classifications[0].prediction
+            == constants.DATA_CATEGORY_TYPE_NON_SPAM
+            else "Above message is a spam message"
+        )
+        st.markdown(f'**{result}**')
+        st.markdown(
+            "Confidence value is: **{accuracy}**".format(
+                accuracy=response.classifications[0].confidence
+            )
+        )
+    data_load_classification.text("")
+
+
 setClassificationLogic()

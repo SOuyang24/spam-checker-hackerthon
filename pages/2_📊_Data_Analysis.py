@@ -1,6 +1,5 @@
 import streamlit as st
 import constants
-import nltk
 import constants
 import dask.dataframe as dd
 import plotly.express as px
@@ -8,11 +7,12 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 import seaborn as sns
 import utils
+import nltk
 
 st.markdown("## :bar_chart: Data Analysis")
 st.sidebar.markdown("## :bar_chart: Data Visualization")
 utils.common_styling()
-nltk.download('punkt')
+# nltk.download('punkt')
 @st.cache_data
 def data_analysis():
     with st.container():
