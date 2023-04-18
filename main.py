@@ -28,7 +28,7 @@ def setPageHeaders():
         st.title("SMS Spam AI Assistant")
         st.markdown("Quickly identify any SMS text message as spam")
         st.markdown(
-            """[Learn More out training dataset >](https://www.kaggle.com/datasets/uciml/sms-spam-collection-dataset)"""
+            """[Learn More out the dataset >](https://www.kaggle.com/datasets/uciml/sms-spam-collection-dataset)"""
         )
 
 

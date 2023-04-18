@@ -9,8 +9,8 @@ import seaborn as sns
 import utils
 import nltk
 nltk.download('punkt')
-st.markdown("## :bar_chart: Data Analysis")
-st.sidebar.markdown("## :bar_chart: Data Analysis")
+st.markdown("## :bar_chart: Data Exploration")
+st.sidebar.markdown("## :bar_chart: Data Exploration")
 utils.common_styling()
 @st.cache_data(persist="disk", show_spinner=True)
 def data_analysis():

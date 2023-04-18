@@ -73,7 +73,7 @@ def setEmbeddedClassificationTFIDF():
     label_encoder = LabelEncoder()
     Y = label_encoder.fit_transform(data["Category"])
     # Splitting the testing and training sets
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42, stratify=Y)
     classifiers = [
                RandomForestClassifier(),
                KNeighborsClassifier(), 
@@ -100,7 +100,7 @@ def setEmbeddedClassificationCohere():
          with left_col:
             df_sample = load_data()
             sms_train, sms_test, labels_train, labels_test = train_test_split(
-            list(df_sample["Message"]), list(df_sample["Category"]), test_size=0.25, random_state=42)
+            list(df_sample["Message"]), list(df_sample["Category"]), test_size=0.2, random_state=42, stratify=list(df_sample["Category"]))
 
             embeddings_train_large = co.embed(texts=sms_train,
                              model="large",
