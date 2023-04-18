@@ -12,7 +12,7 @@ nltk.download('punkt')
 st.markdown("## :bar_chart: Data Analysis")
 st.sidebar.markdown("## :bar_chart: Data Analysis")
 utils.common_styling()
-@st.cache_data
+@st.cache_data(persist="disk")
 def data_analysis():
     with st.container():
         df = dd.read_csv(constants.DATA_SOURCE)

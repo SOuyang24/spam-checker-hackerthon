@@ -60,7 +60,7 @@ def load_data_with_nltk_preprocessing(rowNumber=constants.MAX_ROWS):
         data = data
     return data
 
-@st.cache_data
+@st.cache_data(persist="disk")
 def setEmbeddedClassificationTFIDF():
     data = load_data_with_nltk_preprocessing()
     corpus = []
@@ -84,7 +84,7 @@ def setEmbeddedClassificationTFIDF():
         tfidf_accuracy[utils.print_estimator_name(classifier)] = score
     return tfidf_accuracy
 
-@st.cache_data
+@st.cache_data(persist="disk")
 def setEmbeddedClassificationCohere():
     # Splitting the testing and training sets
     # Build a pipeline of model for four different classifiers.
@@ -129,12 +129,12 @@ def setEmbeddedClassificationCohere():
             return {
                 'Cohere Large Model': cohere_large_list,
                 'Cohere Small Model': cohere_small_list 
-                }            
+                }
+           
 my_dict = {}
 my_dict["TF-IDF"] = setEmbeddedClassificationTFIDF()
 cohereData = setEmbeddedClassificationCohere()
 my_dict["Cohere Small Model"] = cohereData["Cohere Small Model"]
 my_dict["Cohere Large Model"] = cohereData["Cohere Large Model"]
-
 df = pd.DataFrame(my_dict)
 df
