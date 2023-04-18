@@ -12,7 +12,7 @@ import nltk
 st.markdown("## :bar_chart: Data Analysis")
 st.sidebar.markdown("## :bar_chart: Data Analysis")
 utils.common_styling()
-# nltk.download('punkt')
+ nltk.download('punkt')
 @st.cache_data
 def data_analysis():
     with st.container():
