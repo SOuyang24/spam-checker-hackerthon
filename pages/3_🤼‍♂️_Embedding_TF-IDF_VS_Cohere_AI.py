@@ -16,17 +16,18 @@ import matplotlib.pyplot as plt
 import utils
 import constants
 import nltk
+import pandas as pd
 # nltk.download('omw-1.4')
 st.markdown("## 🤼‍♂️ Embedding Comparison")
 st.sidebar.markdown("## 🤼‍♂️ Embedding Comparison")
 utils.common_styling()
 
 co = utils.getCohereApiClient()
-
+accuracy = {}
 
 
 @st.cache_data
-def load_data(rowNumber=constants.MAX_ROWS):
+def load_data(rowNumber=2000):
     data = dd.read_csv(constants.DATA_SOURCE)
     data = data.compute()
     # clean data
@@ -77,11 +78,12 @@ def setEmbeddedClassificationTFIDF():
                RandomForestClassifier(),
                KNeighborsClassifier(), 
                SVC()]
+    tfidf_accuracy = {}
     for classifier in classifiers:
         classifier.fit(X_train, Y_train)     
         score = classifier.score(X_test, Y_test)
-        st.write(f"{utils.print_estimator_name(classifier)} Validation accuracy is {100*score}%!")
-   
+        tfidf_accuracy[utils.print_estimator_name(classifier)] = score
+    return tfidf_accuracy
 
 @st.cache_data
 def setEmbeddedClassificationCohere():
@@ -93,7 +95,6 @@ def setEmbeddedClassificationCohere():
     # Fit all the models on training data
     # Get the cross-validation on the training set for all the models for accuracy
     with st.container():
-         st.header("Cohere")
          left_col, right_col = st.columns(2)
     #Testing on the following classifiers
          with left_col:
@@ -116,10 +117,25 @@ def setEmbeddedClassificationCohere():
             classifiers = [ RandomForestClassifier(),
                             KNeighborsClassifier(), 
                             SVC()]
+            cohere_small_list = {}
             for classifier in classifiers:
                 classifier.fit(embeddings_train_large, labels_train)     
                 score = classifier.score(embeddings_test_large, labels_test)
-                st.write(f"{utils.print_estimator_name(classifier)} Validation accuracy on Large is {100*score}%!")
+                cohere_small_list[utils.print_estimator_name(classifier)] = score
+            cohere_large_list = {}
+            for classifier in classifiers:
+                classifier.fit(embeddings_train_small, labels_train)     
+                score = classifier.score(embeddings_test_small, labels_test)
+                cohere_large_list[utils.print_estimator_name(classifier)] = score
+            return {
+                'Cohere Large Model': cohere_large_list,
+                'Cohere Small Model': cohere_small_list 
+                }            
+my_dict = {}
+my_dict["TF-IDF"] = setEmbeddedClassificationTFIDF()
+cohereData = setEmbeddedClassificationCohere()
+my_dict["Cohere Small Model"] = cohereData["Cohere Small Model"]
+my_dict["Cohere Large Model"] = cohereData["Cohere Large Model"]
 
-setEmbeddedClassificationTFIDF()
-setEmbeddedClassificationCohere()
+df = pd.DataFrame(my_dict)
+df

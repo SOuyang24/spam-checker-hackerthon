@@ -17,8 +17,8 @@ def setPageConfig():
     st.set_page_config(
         page_title="Spam AI Checker Demo", page_icon=":brain:", layout="wide"
     )
-    st.markdown("# Intro 💡")
-    st.sidebar.markdown("# Intro 💡")
+    st.markdown("## Introduction 💡")
+    st.sidebar.markdown("## Introduction 💡")
     utils.common_styling()
 
 

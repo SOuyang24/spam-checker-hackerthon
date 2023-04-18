@@ -11,7 +11,7 @@ import json
 
 
 co = utils.getCohereApiClient()
-
+utils.common_styling()
 if "message" not in st.session_state:
     st.session_state["message"] = ""
 
@@ -126,7 +126,7 @@ def setClassificationLogic():
         left_col, right_col = st.columns([3, 1])
         with left_col:
             option = st.selectbox(
-                "How would you like generate a text message",
+                "How would you like generate a text message?",
                 ("", "From existing dataset", "AI Generated", "Manual Input"),
             )
             if option == "From existing dataset":
@@ -160,7 +160,7 @@ def setClassificationLogic():
                 if classify:
                     data_load_classification = st.text("Start Classification...")
                     response = co.classify(
-                        model="large",
+                        model="small",
                         inputs=st.session_state["classify_inputs"],
                         examples=st.session_state["examples"],
                     )
@@ -180,33 +180,5 @@ def setClassificationLogic():
                         )
 
                     data_load_classification.text("")
-
-
-
-                    
-
-def handle_classification():
-    data_load_classification = st.text("Start Classification...")
-    response = co.classify(
-        model="large",
-        inputs=st.session_state["classify_inputs"],
-        examples=st.session_state["examples"],
-    )
-    st.write(st.session_state["classify_inputs"][0])
-    if len(response.classifications) > 0:
-        result = (
-            "Above message is not a spam message"
-            if response.classifications[0].prediction
-            == constants.DATA_CATEGORY_TYPE_NON_SPAM
-            else "Above message is a spam message"
-        )
-        st.markdown(f'**{result}**')
-        st.markdown(
-            "Confidence value is: **{accuracy}**".format(
-                accuracy=response.classifications[0].confidence
-            )
-        )
-    data_load_classification.text("")
-
 
 setClassificationLogic()

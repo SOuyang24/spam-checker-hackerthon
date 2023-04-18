@@ -10,7 +10,7 @@ import utils
 import nltk
 
 st.markdown("## :bar_chart: Data Analysis")
-st.sidebar.markdown("## :bar_chart: Data Visualization")
+st.sidebar.markdown("## :bar_chart: Data Analysis")
 utils.common_styling()
 # nltk.download('punkt')
 @st.cache_data
@@ -100,18 +100,18 @@ def data_analysis():
             plt.show()
             st.pyplot(fig2)
     st.markdown("### 🔎 Feature Exploration")
-    df["No_of_Characters"] = df["Message"].apply(len)
-    df["No_of_Words"]=df.apply(lambda row: nltk.word_tokenize(row["Message"]), axis=1).apply(len)
-    df["No_of_sentence"]=df.apply(lambda row: nltk.sent_tokenize(row["Message"]), axis=1).apply(len)
+    df["Characters_Count"] = df["Message"].apply(len)
+    df["Words_Count"]=df.apply(lambda row: nltk.word_tokenize(row["Message"]), axis=1).apply(len)
+    df["Sentence_Count"]=df.apply(lambda row: nltk.sent_tokenize(row["Message"]), axis=1).apply(len)
     st.write(df.describe().T)
     plt.figure(figsize=(12,8))
     fg = sns.pairplot(data=df, hue="Category",palette=constants.cols) 
     fg.fig.suptitle("Pairplot of DataSet", y=1.08)      
     st.pyplot(fg)
-    df = df[(df["No_of_Characters"]<400)]
+    df = df[(df["Sentence_Count"]<400)]
     plt.figure(figsize=(12,8))
     fg = sns.pairplot(data=df, hue="Category",palette=constants.cols)
     st.markdown("### 🔎 Outliner Removal")
-    fg.fig.suptitle("Pairplot of DataSet after removing outlier (No_of_Characters < 400)", y=1.08)  
+    fg.fig.suptitle("Pairplot of DataSet after removing outlier (Sentence_Count < 400)", y=1.08)  
     st.pyplot(fg)
 data_analysis()
