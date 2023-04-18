@@ -8,7 +8,7 @@ import dask.dataframe as dd
 import matplotlib.pyplot as plt
 import utils
 import json
-
+from datetime import datetime
 
 co = utils.getCohereApiClient()
 utils.common_styling()
@@ -64,7 +64,6 @@ def generateRandomMessageByAI(prompt):
         st.write(text_message)
     data_load_state.text("")
 
-@st.cache_data
 def generateRandomMessageByDataSet(type):
     if type == constants.DATA_CATEGORY_TYPE_SPAM:
         dataset = st.session_state["json_objects"]
@@ -158,6 +157,7 @@ def setClassificationLogic():
                     # on_click=handle_classification
                 )
                 if classify:
+                    t1 = datetime.now()
                     data_load_classification = st.text("Start Classification...")
                     response = co.classify(
                         model="small",
@@ -178,7 +178,9 @@ def setClassificationLogic():
                                 accuracy=response.classifications[0].confidence
                             )
                         )
-
+                    t2 = datetime.now()
+                    delta = t2 - t1
+                    st.write(f"Total prediction takes {delta.total_seconds()} seconds")
                     data_load_classification.text("")
 
 setClassificationLogic()
