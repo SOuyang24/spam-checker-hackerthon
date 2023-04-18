@@ -107,10 +107,10 @@ def data_analysis():
     fg = sns.pairplot(data=df, hue="Category",palette=constants.cols) 
     fg.fig.suptitle("Pairplot of DataSet", y=1.08)      
     st.pyplot(fg)
-    df = df[(df["Sentence_Count"]<400)]
+    df = df[(df["Characters_Count"]<400)]
     plt.figure(figsize=(12,8))
     fg = sns.pairplot(data=df, hue="Category",palette=constants.cols)
     st.markdown("### 🔎 Outliner Removal")
-    fg.fig.suptitle("Pairplot of DataSet after removing outlier (Sentence_Count < 400)", y=1.08)  
+    fg.fig.suptitle("Pairplot of DataSet after removing outlier (Characters_Count < 400)", y=1.08)  
     st.pyplot(fg)
 data_analysis()

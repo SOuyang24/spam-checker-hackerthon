@@ -17,6 +17,7 @@ import constants
 import nltk
 import pandas as pd
 nltk.download('omw-1.4')
+nltk.download('punkt')
 st.markdown("## 🤼‍♂️ Embedding Comparison")
 st.sidebar.markdown("## 🤼‍♂️ Embedding Comparison")
 utils.common_styling()
