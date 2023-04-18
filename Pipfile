@@ -21,6 +21,9 @@ decouple = "*"
 wordcloud = "*"
 python-dotenv = "*"
 dask = "*"
+regex = "*"
+nltk = "*"
+seaborn = "*"
 
 [dev-packages]
 black="*"

@@ -16,11 +16,13 @@ import dask.dataframe as dd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 
+import re
+import nltk
+import constants
 # VARIABLES
 DATA_SOURCE = "dataset/spam.csv"
 MAX_ROWS = 1000
 LOTTIE_AI_JSON = "https://assets2.lottiefiles.com/packages/lf20_zrqthn6o.json"
-# API_KEY = st.secrets["API_KEY"]
 config = dotenv_values(".env")
 API_KEY = config["API_KEY"]
 co = cohere.Client(API_KEY)
@@ -44,101 +46,38 @@ if "classify_inputs" not in st.session_state:
 if "json_objects" not in st.session_state:
     st.session_state["json_objects"] = []
 
+def clean(Message):
+    # Replacing all non-alphabetic characters with a space
+    sms = re.sub('[^a-zA-Z]', ' ', Message) 
+    #converting to lowecase
+    sms = sms.lower() 
+    sms = sms.split()
+    sms = ' '.join(sms)
+    return sms
 
 @st.cache_data
-def load_data():
+def load_data(rowNumber=MAX_ROWS):
     data = dd.read_csv(DATA_SOURCE)
     data = data.compute()
-    if (data.shape[0]) > MAX_ROWS:
-        df = data.head(MAX_ROWS)
+    data["Message"] = data["Message"].apply(clean)
+    if (data.shape[0]) > rowNumber:
+        df = data.sample(rowNumber)
     else:
         df = data
     return df
 
+def generate_word_cloud(colorMap, textCollection):
+    cloud = WordCloud(
+                width=520,
+                height=260,
+                stopwords=STOPWORDS,
+                max_font_size=50,
+                background_color="black",
+                colormap=colorMap,
+            ).generate(textCollection)
 
-@st.cache_data
-def load_all_data():
-    with st.container():
-        st.write("---")
-        df = dd.read_csv(DATA_SOURCE)
-        df = df.compute()
-        left_col, right_col = st.columns(2)
-        with right_col:
-            spam_text_list = df.query("Category == 'spam'")["Message"].values.tolist()
-            spam_text_collection = " ".join(spam_text_list)
-            ham_text_list = df.query("Category == 'ham'")["Message"].values.tolist()
-            ham_text_collection = " ".join(ham_text_list)
-            # Create and generate a word cloud image:
-            wordcloud_spam = WordCloud(
-                width=520,
-                height=260,
-                stopwords=STOPWORDS,
-                max_font_size=50,
-                background_color="black",
-                colormap="Blues",
-            ).generate(spam_text_collection)
-            wordcloud_ham = WordCloud(
-                width=520,
-                height=260,
-                stopwords=STOPWORDS,
-                max_font_size=50,
-                background_color="black",
-                colormap="Greens",
-            ).generate(ham_text_collection)
-            # Display the generated image:
-            fig1, ax = plt.subplots()
-            plt.title("Spam Word Cloud")
-            plt.imshow(wordcloud_spam, interpolation="bilinear")
-            plt.axis("off")
-            plt.show()
-            st.pyplot(fig1)
-            fig2, ax = plt.subplots()
-            plt.title("Non Spam Word Cloud")
-            plt.imshow(wordcloud_ham, interpolation="bilinear")
-            plt.axis("off")
-            plt.show()
-            st.pyplot(fig2)
-        with left_col:
-            st.header("Data Visualization :bar_chart:")
-            st.write("##")
-            counts_by_Category = (
-                df.groupby(by=["Category"])
-                .count()[["Message"]]
-                .sort_values(by="Category")
-            )
-            fig_spam_check = px.bar(
-                counts_by_Category,
-                x=counts_by_Category.index,
-                y="Message",
-                orientation="v",
-                title="<b>Text Message by Category</b>",
-                # color_discrete_sequence=["#0083B8"] * len(counts_by_Category),
-                color_discrete_map={"spam": "red", "ham": "green"},
-                color=["ham", "spam"],
-                template="plotly_white",
-                labels={
-                    "Message": "Message Count",
-                    "Category": "Message Category",
-                },
-            )
-            config = {
-                "toImageButtonOptions": {
-                    "format": "svg",  # one of png, svg, jpeg, webp
-                    "filename": "custom_image",
-                    "height": 500,
-                    "width": 700,
-                    "scale": 1,  # Multiply title/legend/axis/canvas sizes by this factor
-                },
-                "displaylogo": False,
-                "modeBarButtonsToRemove": ["zoom", "pan"],
-            }
-            fig_spam_check.update_layout(
-                plot_bgcolor="rgba(0,0,0,0)",
-                yaxis=dict(showgrid=False),
-                margin=dict(l=20, r=20, t=20, b=20),
-            )
-            st.set_option("deprecation.showPyplotGlobalUse", False)
-            st.plotly_chart(fig_spam_check, use_container_width=False, config=config)
+
+
 
 
 def load_lottieUrl(url):
@@ -152,6 +91,8 @@ def setPageConfig():
     st.set_page_config(
         page_title="Spam AI Checker Demo", page_icon=":brain:", layout="wide"
     )
+    st.markdown("# Intro 💡")
+    st.sidebar.markdown("# Intro 💡")
 
 
 def setPageHeaders():
@@ -270,6 +211,46 @@ def generateRandomMessageByDataSet(type):
 def setDataVisualization():
     load_all_data()
 
+def print_estimator_name(estimator):
+    return estimator.__class__.__name__
+
+@st.cache_data
+def setEmbeddedClassification():
+    # Splitting the testing and training sets
+    # Build a pipeline of model for four different classifiers.
+    # RandomForestClassifier
+    # KNeighborsClassifier
+    # Support Vector Machines
+    # Fit all the models on training data
+    # Get the cross-validation on the training set for all the models for accuracy
+    with st.container():
+         st.write("---")
+         st.header("Classification Comparison")
+         left_col, right_col = st.columns(2)
+    #Testing on the following classifiers
+         with left_col:
+            df_sample = load_data()
+            sms_train, sms_test, labels_train, labels_test = train_test_split(
+            list(df_sample["Message"]), list(df_sample["Category"]), test_size=0.25, random_state=42)
+            embeddings_train_large = co.embed(texts=sms_train,
+                             model="large",
+                             truncate="RIGHT").embeddings
+            embeddings_test_large = co.embed(texts=sms_test,
+                             model="large",
+                             truncate="RIGHT").embeddings
+            embeddings_train_small = co.embed(texts=sms_train,
+                             model="small",
+                             truncate="RIGHT").embeddings
+            embeddings_test_small = co.embed(texts=sms_test,
+                             model="small",
+                             truncate="RIGHT").embeddings                            
+            classifiers = [ RandomForestClassifier(),
+                            KNeighborsClassifier(), 
+                            SVC()]
+            for classifier in classifiers:
+                classifier.fit(embeddings_train_large, labels_train)     
+                score = classifier.score(embeddings_test, labels_test)
+                st.write(f"{print_estimator_name(classifier)} Validation accuracy on Large is {100*score}%!")
 
 def setClassificationLogic():
     data = load_data()
@@ -336,5 +317,6 @@ def setClassificationLogic():
 setPageConfig()
 setPageHeaders()
 setPageBodyLayout()
-setDataVisualization()
-setClassificationLogic()
+# setDataVisualization()
+# setEmbeddedClassification()
+# setClassificationLogic()
