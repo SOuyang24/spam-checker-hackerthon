@@ -16,6 +16,11 @@ import utils
 import constants
 import nltk
 import pandas as pd
+from datetime import datetime
+# import warnings filter
+from warnings import simplefilter
+# ignore all future warnings
+simplefilter(action='ignore', category=FutureWarning)
 nltk.download('omw-1.4')
 nltk.download('punkt')
 st.markdown("## 🤼‍♂️ Embedding Comparison")
@@ -63,6 +68,7 @@ def load_data_with_nltk_preprocessing(rowNumber=constants.MAX_ROWS):
 
 @st.cache_data(persist="disk", show_spinner=True)
 def setEmbeddedClassificationTFIDF():
+    t1 = datetime.now()
     data = load_data_with_nltk_preprocessing()
     corpus = []
     for i in data["Message"]:
@@ -83,6 +89,9 @@ def setEmbeddedClassificationTFIDF():
         classifier.fit(X_train, Y_train)     
         score = classifier.score(X_test, Y_test)
         tfidf_accuracy[utils.print_estimator_name(classifier)] = score
+    t2 = datetime.now()
+    delta = t2 - t1
+    st.write(f"Classification using TF-IDF takes {delta.total_seconds()} seconds")
     return tfidf_accuracy
 
 @st.cache_data(persist="disk", show_spinner=True)
@@ -98,6 +107,7 @@ def setEmbeddedClassificationCohere():
          left_col, right_col = st.columns(2)
     #Testing on the following classifiers
          with left_col:
+            t1 = datetime.now()
             df_sample = load_data()
             sms_train, sms_test, labels_train, labels_test = train_test_split(
             list(df_sample["Message"]), list(df_sample["Category"]), test_size=0.2, random_state=42, stratify=list(df_sample["Category"]))
@@ -127,6 +137,9 @@ def setEmbeddedClassificationCohere():
                 classifier.fit(embeddings_train_small, labels_train)     
                 score = classifier.score(embeddings_test_small, labels_test)
                 cohere_large_list[utils.print_estimator_name(classifier)] = score
+            t2 = datetime.now()
+            delta = t2 - t1
+            st.write(f"Classification using Cohere takes {delta.total_seconds()} seconds")
             return {
                 'Cohere Large Model': cohere_large_list,
                 'Cohere Small Model': cohere_small_list 
