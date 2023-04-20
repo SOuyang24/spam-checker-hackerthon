@@ -29,7 +29,7 @@ def load_data(rowNumber=constants.MAX_ROWS):
     data = dd.read_csv(constants.DATA_SOURCE)
     data = data.compute()
     if (data.shape[0]) > rowNumber:
-        df = data.sample(rowNumber)
+        df = data.groupby('Category', group_keys=False).apply(lambda x: x.sample(frac=0.2))
     else:
         df = data
     return df
@@ -129,7 +129,6 @@ def setClassificationLogic():
                 ("", "From existing dataset", "AI Generated", "Manual Input"),
             )
             if option == "From existing dataset":
-                # st.session_state["classify_inputs"] = []
                 generateRandomMessageComponent("Dataset")
             elif option == "Manual Input":
                 with st.container():
@@ -144,12 +143,11 @@ def setClassificationLogic():
                     inputs.append(text_message)
                     st.session_state["classify_inputs"] = inputs
             elif option == "AI Generated":
-                # st.session_state["classify_inputs"] = []
                 generateRandomMessageComponent("AI")
 
             with st.container():
                 classify = st.button(
-                    "Start classify",
+                    "Start Predict",
                     type="primary",
                     disabled=False
                     if len(st.session_state["classify_inputs"]) > 0
@@ -158,7 +156,7 @@ def setClassificationLogic():
                 )
                 if classify:
                     t1 = datetime.now()
-                    data_load_classification = st.text("Start Classification...")
+                    data_load_classification = st.text("Start Prediction...")
                     response = co.classify(
                         model="small",
                         inputs=st.session_state["classify_inputs"],
