@@ -34,7 +34,7 @@ nltk.download('punkt')
 st.markdown("## 🤼‍♂️ Embedding Comparison")
 st.sidebar.markdown("## 🤼‍♂️ Embedding Comparison")
 utils.common_styling()
-
+co = utils.getCohereApiClient()
 accuracy = {}
 
 
@@ -118,7 +118,6 @@ def setEmbeddedClassificationCohere():
             df_sample = load_data()
             sms_train, sms_test, labels_train, labels_test = train_test_split(
             list(df_sample["Message"]), list(df_sample["Category"]), test_size=0.2, random_state=42, stratify=list(df_sample["Category"]))
-            st.write(sms_train)
             embeddings_train_small = co.embed(texts=sms_train,
                              model="small",
                              truncate="RIGHT").embeddings

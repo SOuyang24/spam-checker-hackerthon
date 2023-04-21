@@ -5,6 +5,10 @@ import requests
 from streamlit_lottie import st_lottie
 import constants
 import utils
+import ssl
+
+
+
 
 def load_lottieUrl(url):
     response = requests.get(url)
@@ -20,6 +24,13 @@ def setPageConfig():
     st.markdown("## Introduction 💡")
     st.sidebar.markdown("## Introduction 💡")
     utils.common_styling()
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+    co = utils.getCohereApiClient()
 
 
 def setPageHeaders():

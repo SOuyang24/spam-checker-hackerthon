@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import utils
 import json
 from datetime import datetime
+import ssl
 
-co = utils.getCohereApiClient()
-utils.common_styling()
+
 if "message" not in st.session_state:
     st.session_state["message"] = ""
 
@@ -21,6 +21,8 @@ if "classify_inputs" not in st.session_state:
 if "json_objects" not in st.session_state:
     st.session_state["json_objects"] = []
 
+utils.common_styling()
+co = utils.getCohereApiClient()
 st.markdown("### 🤖 Spam Prediction")
 st.sidebar.markdown("### 🤖 Spam Prediction")
 
@@ -52,7 +54,7 @@ def generateRandomMessageByAI(prompt):
         model="command-xlarge-nightly",
         prompt=prompt,
         max_tokens=100,
-        temperature=1,
+        temperature=4,
         k=0,
         stop_sequences=[],
         return_likelihoods="NONE",
@@ -126,7 +128,8 @@ def setClassificationLogic():
         with left_col:
             option = st.selectbox(
                 "How would you like generate a text message?",
-                ("", "From existing dataset", "AI Generated", "Manual Input"),
+                ("", "Manual Input", "From existing dataset"),
+                # ("", "Manual Input", "From existing dataset", "AI Generated"),
             )
             if option == "From existing dataset":
                 generateRandomMessageComponent("Dataset")
@@ -152,7 +155,6 @@ def setClassificationLogic():
                     disabled=False
                     if len(st.session_state["classify_inputs"]) > 0
                     else True,
-                    # on_click=handle_classification
                 )
                 if classify:
                     t1 = datetime.now()
