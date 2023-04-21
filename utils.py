@@ -25,6 +25,7 @@ def getCohereApiClient():
     co = cohere.Client(API_KEY)
     return co
 
+
 def clean(Message):
     # Replacing all non-alphabetic characters with a space
     sms = re.sub('[^a-zA-Z]', ' ', Message) 

@@ -52,7 +52,7 @@ def generateRandomMessageByAI(prompt):
         model="command-xlarge-nightly",
         prompt=prompt,
         max_tokens=100,
-        temperature=0.9,
+        temperature=1,
         k=0,
         stop_sequences=[],
         return_likelihoods="NONE",

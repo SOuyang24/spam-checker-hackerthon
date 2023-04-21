@@ -19,6 +19,14 @@ import pandas as pd
 from datetime import datetime
 # import warnings filter
 from warnings import simplefilter
+import ssl
+
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
 # ignore all future warnings
 simplefilter(action='ignore', category=FutureWarning)
 nltk.download('omw-1.4')
@@ -27,7 +35,6 @@ st.markdown("## 🤼‍♂️ Embedding Comparison")
 st.sidebar.markdown("## 🤼‍♂️ Embedding Comparison")
 utils.common_styling()
 
-co = utils.getCohereApiClient()
 accuracy = {}
 
 
@@ -39,7 +46,7 @@ def load_data(rowNumber=2000):
     data["Message"] = data["Message"].apply(utils.clean)
     # sampling the data
     if (data.shape[0]) > rowNumber:
-        data = data.sample(rowNumber)
+        data = data.groupby('Category', group_keys=False).apply(lambda x: x.sample(frac=0.2))
     else:
         data = data
     return data
@@ -111,13 +118,7 @@ def setEmbeddedClassificationCohere():
             df_sample = load_data()
             sms_train, sms_test, labels_train, labels_test = train_test_split(
             list(df_sample["Message"]), list(df_sample["Category"]), test_size=0.2, random_state=42, stratify=list(df_sample["Category"]))
-
-            # embeddings_train_large = co.embed(texts=sms_train,
-            #                  model="large",
-            #                  truncate="RIGHT").embeddings
-            # embeddings_test_large = co.embed(texts=sms_test,
-            #                  model="large",
-            #                  truncate="RIGHT").embeddings
+            st.write(sms_train)
             embeddings_train_small = co.embed(texts=sms_train,
                              model="small",
                              truncate="RIGHT").embeddings
@@ -127,11 +128,6 @@ def setEmbeddedClassificationCohere():
             classifiers = [ RandomForestClassifier(),
                             KNeighborsClassifier(), 
                             SVC()]
-            # cohere_large_list = {}
-            # for classifier in classifiers:
-            #     classifier.fit(embeddings_train_large, labels_train)     
-            #     score = classifier.score(embeddings_test_large, labels_test)
-            #     cohere_large_list[utils.print_estimator_name(classifier)] = score
             cohere_small_list = {}
             for classifier in classifiers:
                 classifier.fit(embeddings_train_small, labels_train)     
@@ -141,14 +137,13 @@ def setEmbeddedClassificationCohere():
             delta = t2 - t1
             st.write(f"Classification using Cohere takes {delta.total_seconds()} seconds")
             return {
-                # 'Cohere Large Model': cohere_large_list,
                 'Cohere Small Model': cohere_small_list 
                 }
            
 my_dict = {}
 my_dict["TF-IDF"] = setEmbeddedClassificationTFIDF()
 cohereData = setEmbeddedClassificationCohere()
+
 my_dict["Cohere Small Model"] = cohereData["Cohere Small Model"]
-# my_dict["Cohere Large Model"] = cohereData["Cohere Large Model"]
 df = pd.DataFrame(my_dict)
 df

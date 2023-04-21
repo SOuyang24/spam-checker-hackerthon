@@ -4,7 +4,7 @@ MAX_ROWS = 1000
 LOTTIE_AI_JSON = "https://assets2.lottiefiles.com/packages/lf20_zrqthn6o.json"
 textMessage = ""
 AI_PROMPT_SPAM = "I want you act as prompt generator, generate sample SMS text message that is a spam message and less than 150 characters"
-AI_PROMPT_NON_SPAM = "I want you act as prompt generator, generate sample SMS text message that is not a spam message and less than 150 characters"
+AI_PROMPT_NON_SPAM = "I want you act as prompt generator, generate sample SMS text message that is a legitimate message and less than 150 characters"
 DATA_CATEGORY_TYPE_SPAM = "spam"
 DATA_CATEGORY_TYPE_NON_SPAM = "ham"
 FORMATTED_TXT = """<span style="word-wrap:break-word;">{content}</span>"""

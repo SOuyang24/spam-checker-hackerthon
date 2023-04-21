@@ -24,7 +24,7 @@ dask = "*"
 regex = "*"
 nltk = "*"
 seaborn = "*"
-google-cloud-translate = "*"
+scikit-learn = "*"
 
 [dev-packages]
 black="*"
